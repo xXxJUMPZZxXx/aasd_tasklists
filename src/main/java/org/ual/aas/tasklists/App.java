@@ -1,5 +1,12 @@
 package org.ual.aas.tasklists;
 
+import java.util.List;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistry;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.ual.aas.tasklists.models.Task;
 import org.ual.aas.tasklists.models.TaskList;
 
@@ -10,6 +17,7 @@ public class App  {
 			System.out.println(task.getDescription());
 		}
 	}
+	
     public static void main( String[] args ) {
         TaskList taskList = new TaskList("Sample Task List");
         taskList.getTasks().add(new Task("1st task", "doing"));
@@ -17,5 +25,39 @@ public class App  {
         taskList.getTasks().add(new Task("3rd task", "doing"));
         
         printTaskList(taskList);
+        
+        
+        SessionFactory sessionFactory = null;
+    	final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+				.configure("resource/hibernate.cfg.xml")
+				.build();
+        try {
+        	sessionFactory  = new MetadataSources(registry).buildMetadata().buildSessionFactory();
+        } catch(Exception e) {
+        	e.printStackTrace();
+        	System.exit(1);
+        }
+        
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.save(taskList);
+        session.getTransaction().commit();
+        session.close();
+
+
+        session = sessionFactory.openSession();
+		session.beginTransaction();
+		
+		List resultSet = session.createQuery("from TaskList").list();
+		for(TaskList tl : (List<TaskList>)resultSet) {
+			printTaskList(tl);
+		}
+
+		session.getTransaction().commit();
+		session.close();
+        
+        sessionFactory.close();
+        
+        
     }
 }
