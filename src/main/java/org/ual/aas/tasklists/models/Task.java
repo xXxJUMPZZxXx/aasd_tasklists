@@ -3,15 +3,12 @@ package org.ual.aas.tasklists.models;
 public class Task {
 	private int id;
 	private String description;
-	private String status;
+	private String status; // doing, done
 	
 	public Task() {
-		super();
 	}
 
-	public Task(int id, String description, String status) {
-		super();
-		this.id = id;
+	public Task(String description, String status) {
 		this.description = description;
 		this.status = status;
 	}
